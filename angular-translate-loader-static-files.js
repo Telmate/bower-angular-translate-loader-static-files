@@ -1,7 +1,15 @@
-angular.module('pascalprecht.translate').factory('$translateStaticFilesLoader', [
+angular.module('pascalprecht.translate')
+.factory('$translateStaticFilesCache', [
+  '$cacheFactory',
+  function($cacheFactory) {
+    return $cacheFactory('translateStaticFiles');
+  }
+])
+.factory('$translateStaticFilesLoader', [
   '$q',
   '$http',
-  function ($q, $http) {
+  '$translateStaticFilesCache',
+  function ($q, $http, $translateStaticFilesCache) {
     return function (options) {
       if (!options || (!options.prefix || !options.suffix)) {
         throw new Error('Couldn\'t load static files, no prefix or suffix specified!');
@@ -14,7 +22,8 @@ angular.module('pascalprecht.translate').factory('$translateStaticFilesLoader', 
           options.suffix
         ].join(''),
         method: 'GET',
-        params: ''
+        params: '',
+        cache: $translateStaticFilesCache
       }).success(function (data) {
         deferred.resolve(data);
       }).error(function (data) {
